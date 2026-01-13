@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Application\Users\UserManagementService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -9,16 +10,14 @@ use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
 {
+    public function __construct(
+        private readonly UserManagementService $service
+    ) {}
+
     public function index(Request $request)
     {
-        // We already protected with permission:users.manage in routes
-
-        $users = User::with('roles')
-            ->orderBy('id')
-            ->paginate(10)
-            ->withQueryString();
-
-        $roles = Role::all()->pluck('name'); // ["admin", "candidate"]
+        $users = $this->service->listUsers($request->user());
+        $roles = Role::all()->pluck('name');
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
@@ -32,30 +31,15 @@ class UserManagementController extends Controller
             'role' => ['required', 'string', 'exists:roles,name'],
         ]);
 
-        // Do not let admin remove their own last admin role if you want safety
-        $roleName = $request->input('role');
+        $this->service->updateRole($request->user(), $user->id, $request->string('role'));
 
-        // Clear all roles and set new one
-        $user->syncRoles([$roleName]);
-
-        return redirect()
-            ->back()
-            ->with('success', "Role updated to {$roleName}.");
+        return redirect()->back()->with('success', 'Role updated.');
     }
 
     public function destroy(Request $request, User $user)
     {
-        // Optional: prevent deleting yourself
-        if ($request->user()->id === $user->id) {
-            return redirect()
-                ->back()
-                ->with('error', 'You cannot delete your own account.');
-        }
+        $this->service->deleteUser($request->user(), $user->id);
 
-        $user->delete();
-
-        return redirect()
-            ->back()
-            ->with('success', 'User deleted.');
+        return redirect()->back()->with('success', 'User deleted.');
     }
 }

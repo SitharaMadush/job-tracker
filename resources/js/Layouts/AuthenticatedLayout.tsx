@@ -1,15 +1,17 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import ApplicationLogo from '@/components/ApplicationLogo';
+import Dropdown from '@/components/Dropdown';
+import NavLink from '@/components/NavLink';
+import ResponsiveNavLink from '@/components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
+
 
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const user = usePage().props.auth.user;
+    const canManageUsers = user.permissions?.includes("users.manage");
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -28,11 +30,20 @@ export default function Authenticated({
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
+                                    href={route("job-applications.index")}
+                                    active={route().current("job-applications.*")}
                                 >
-                                    Dashboard
+                                    Applications
                                 </NavLink>
+
+                                {canManageUsers && (
+                                    <NavLink
+                                    href={route("admin.users.index")}
+                                    active={route().current("admin.users.*")}
+                                    >
+                                    User Management
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 

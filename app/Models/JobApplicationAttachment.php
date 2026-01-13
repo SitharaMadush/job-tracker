@@ -13,4 +13,18 @@ class JobApplicationAttachment extends Model
         'mime_type',
         'size',
     ];
+
+    protected $appends = [
+        'url',
+    ];
+
+    public function JobApplication()
+    {
+        return $this->belongsTo(JobApplication::class);
+    }
+
+    public function getUrlAttribute()
+    {
+        return asset('storage/' . $this->path);
+    }
 }
