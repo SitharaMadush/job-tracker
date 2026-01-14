@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class JobApplicationAttachment extends Model
 {
@@ -25,6 +26,7 @@ class JobApplicationAttachment extends Model
 
     public function getUrlAttribute()
     {
-        return asset('storage/' . $this->path);
+        // return asset('storage/' . $this->path);
+        return Storage::disk('public')->url($this->path);
     }
 }

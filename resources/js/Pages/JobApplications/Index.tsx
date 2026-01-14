@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { log } from "console";
 
 type Filters = {
     status?: string | null;
@@ -51,6 +52,7 @@ type PageProps = {
 };
 
 type FormData = {
+    _method?: string;
     company_name: string;
     position: string;
     job_url: string;
@@ -81,9 +83,14 @@ export default function Index() {
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editing, setEditing] = useState<JobApplication | null>(null);
+    const [selectedImage, setSelectedImage] = useState<{
+        url: string;
+        name: string;
+    } | null>(null);
 
     const { data, setData, post, put, processing, errors, reset } =
         useForm<FormData>({
+            _method: "POST",
             company_name: "",
             position: "",
             job_url: "",
@@ -98,6 +105,7 @@ export default function Index() {
 
     const openCreate = () => {
         reset();
+        setData("_method", "POST");
         setEditing(null);
         setIsDialogOpen(true);
     };
@@ -105,6 +113,7 @@ export default function Index() {
     const openEdit = (app: JobApplication) => {
         setEditing(app);
         setData({
+            _method: "PUT",
             company_name: app.company_name,
             position: app.position,
             job_url: app.job_url ?? "",
@@ -137,7 +146,10 @@ export default function Index() {
         };
 
         if (editing) {
-            put(route("job-applications.update", editing.id), options);
+            // 👇 Send POST with _method = put (method spoofing)
+            setData("_method", "put");
+
+            post(route("job-applications.update", editing.id), options);
         } else {
             post(route("job-applications.store"), options);
         }
@@ -557,7 +569,13 @@ export default function Index() {
                                                 <img
                                                     src={att.url}
                                                     alt={att.original_name}
-                                                    className="h-8 w-8 rounded object-cover"
+                                                    className="h-20 w-20 rounded object-cover border border-gray-200 cursor-pointer"
+                                                    onClick={() =>
+                                                        setSelectedImage({
+                                                            url: att.url,
+                                                            name: att.original_name,
+                                                        })
+                                                    }
                                                 />
                                             )}
                                             <a
@@ -602,6 +620,46 @@ export default function Index() {
                             </Button>
                         </DialogFooter>
                     </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Image Modal  */}
+            <Dialog
+                open={!!selectedImage}
+                onOpenChange={() => setSelectedImage(null)}
+            >
+                <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                        <DialogTitle>Preview</DialogTitle>
+                    </DialogHeader>
+
+                    {selectedImage && (
+                        <div className="flex items-center justify-center p-2">
+                            <img
+                                src={selectedImage.url}
+                                alt="preview"
+                                className="max-h-[80vh] w-auto rounded shadow-md"
+                            />
+                        </div>
+                    )}
+
+                    <DialogFooter className="flex justify-between">
+                        {selectedImage && (
+                            <a
+                                href={selectedImage.url}
+                                download={selectedImage.name ?? "download"}
+                                className="mr-auto"
+                            >
+                                <Button variant="secondary">Download</Button>
+                            </a>
+                        )}
+                        <Button
+                            variant="outline"
+                            onClick={() => setSelectedImage(null)}
+                        >
+                            Close
+                        </Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </AuthenticatedLayout>

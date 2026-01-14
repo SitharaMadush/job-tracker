@@ -4,10 +4,8 @@ use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobApplicationAttachmentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
-use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Symfony\Component\Console\Application;
 
 Route::get('/', function () {
     return redirect()->route('job-applications.index');

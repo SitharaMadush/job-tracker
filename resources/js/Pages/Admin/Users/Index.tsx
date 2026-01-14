@@ -32,6 +32,8 @@ export default function Index() {
   }>({ role: "" });
 
   const handleRoleChange = (userId: number, role: string) => {
+    console.log("-------------------------------------", userId, role);
+
     setData("role", role);
     put(route("admin.users.updateRole", userId), {
       preserveScroll: true,

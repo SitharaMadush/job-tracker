@@ -27,6 +27,7 @@ class UserManagementController extends Controller
 
     public function updateRole(Request $request, User $user)
     {
+        dd($request->all());
         $request->validate([
             'role' => ['required', 'string', 'exists:roles,name'],
         ]);
