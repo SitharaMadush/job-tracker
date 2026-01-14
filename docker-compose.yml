@@ -26,6 +26,20 @@ services:
       - app
     networks:
       - appnet
+    labels:
+      - traefik.enable=true
+
+      # 👇 Ensure Traefik uses the proxy network
+      - traefik.docker.network=proxy
+
+      # Router: domain for your API
+      - traefik.http.routers.job_tracker.rule=Host(`job-tracker.madush.dev`)
+      - traefik.http.routers.job_tracker.entrypoints=websecure
+      - traefik.http.routers.job_tracker.tls=true
+      - traefik.http.routers.job_tracker.tls.certresolver=le
+
+      # Service: nginx listens on port 80 internally
+      - traefik.http.services.job_tracker.loadbalancer.server.port=80
 
   mysql:
     image: mysql:8.0
