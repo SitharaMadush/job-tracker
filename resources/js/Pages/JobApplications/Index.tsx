@@ -146,9 +146,6 @@ export default function Index() {
         };
 
         if (editing) {
-            // 👇 Send POST with _method = put (method spoofing)
-            setData("_method", "put");
-
             post(route("job-applications.update", editing.id), options);
         } else {
             post(route("job-applications.store"), options);
@@ -200,9 +197,11 @@ export default function Index() {
         setData("attachments", Array.from(e.target.files));
     };
 
+    const anyErrors = errors as Record<string, string>;
+
+
     return (
         <AuthenticatedLayout
-            user={auth.user}
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
                     Job Application Tracker
@@ -545,9 +544,9 @@ export default function Index() {
                                 accept="image/*,.pdf"
                                 onChange={onFileChange}
                             />
-                            {errors["attachments.0"] && (
+                            {anyErrors["attachments.0"] && (
                                 <p className="mt-1 text-xs text-red-500">
-                                    {errors["attachments.0"]}
+                                    {anyErrors["attachments.0"]}
                                 </p>
                             )}
                         </div>

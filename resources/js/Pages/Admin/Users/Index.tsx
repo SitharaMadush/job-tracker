@@ -1,6 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, usePage } from "@inertiajs/react";
-import type { AuthUser, Paginated } from "@/types";
+import type { PageProps as InertiaPageProps } from "@inertiajs/core";
+import type { User, Paginated } from "@/types";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -14,25 +15,24 @@ interface UserRow {
   roles: { name: string }[];
 }
 
-interface PageProps {
-  auth: { user: AuthUser };
+type UsersPageProps = Record<string, unknown> & {
+  auth: { user: User };
   users: Paginated<UserRow>;
   roles: string[];
   flash?: {
     success?: string;
     error?: string;
   };
-}
+};
 
 export default function Index() {
-  const { auth, users, roles, flash } = usePage<PageProps>().props;
+  const { auth, users, roles, flash } = usePage<UsersPageProps>().props;
 
   const { setData, put, delete: destroy, processing } = useForm<{
     role: string;
   }>({ role: "" });
 
   const handleRoleChange = (userId: number, role: string) => {
-    console.log("-------------------------------------", userId, role);
 
     setData("role", role);
     put(route("admin.users.updateRole", userId), {
@@ -50,7 +50,6 @@ export default function Index() {
 
   return (
     <AuthenticatedLayout
-      user={auth.user}
       header={
         <h2 className="text-xl font-semibold leading-tight text-gray-800">
           User Management
