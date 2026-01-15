@@ -25,7 +25,7 @@ class UpdateJobApplicationRequest extends FormRequest
             'notes'        => ['nullable', 'string'],
 
             'attachments'   => ['nullable', 'array'],
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:4096'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf', 'max:10240'],
         ];
     }
 }

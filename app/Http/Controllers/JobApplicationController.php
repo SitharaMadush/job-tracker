@@ -34,7 +34,6 @@ class JobApplicationController extends Controller
 
     public function store(StoreJobApplicationRequest $request)
     {
-        dd($request->all());
         $user = $request->user();
 
         $data = $request->validated();
